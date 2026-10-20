@@ -180,3 +180,17 @@ docker compose up -d --no-deps marinara
 | --- | --- |
 | `gacha-ko-runtime.cjs` | 한국어 배경 및 스탠딩 매칭을 수정하는 런타임 코드 |
 | `gacha-ko-patchctl.py` | 설치 상태 확인, v1 → v2 업그레이드, 신규 설치 및 이전 설정 복구 |
+
+
+## Gacha Forge 1.8.13 전용 한국어 스탠딩 패치 (추가)
+
+**1.8.13의 공식 배경 식별자 수정은 건드리지 않습니다.** 신규 `gacha-standing-ko-1813-runtime.cjs`는 대사 화자 이름 정규화 `Kl()`의 한글 손실만 방지합니다. 기존 `gacha-ko-runtime.cjs`와 `gacha-ko-patchctl.py`는 **1.8.12 전용**으로 유지했습니다.
+
+1.8.13 사용자는 기존 한국어·배경 통합 로더를 함께 활성화하지 말고, 신규 파일을 Docker Compose에 읽기 전용으로 마운트한 뒤 `NODE_OPTIONS`의 `--require` 목록에 **`--require=/app/gacha-standing-ko-1813-runtime.cjs`**를 추가해야 합니다. 다른 패치의 `--require` 항목을 삭제하지 마세요. 다운로드:
+
+```bash
+cd /root/Marinara-Engine
+curl -fL --retry 3 https://raw.githubusercontent.com/tlsiddl/gacha-forge-korean-patch/main/gacha-standing-ko-1813-runtime.cjs -o gacha-standing-ko-1813-runtime.cjs
+```
+
+이 단계는 **다운로드만** 수행합니다. 서버별 Compose 구조가 다르므로, 원래 설정을 백업하고 최종 Compose에 마운트·환경변수를 병합한 후 재시작하세요. 기존 1.8.12용 로더와 중복 실행하지 마세요. 정상 등록 로그는 `[gacha-standing-ko] hook registered`, 라우트 후킹 로그는 `route transformed in memory`입니다. 실제 브라우저 스탠딩 표시 검증은 별도입니다.
